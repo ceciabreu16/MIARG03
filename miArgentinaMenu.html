@@ -4,10 +4,6 @@
   <meta charset="UTF-8">
   <title>Navbar</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
-  
 </head>
 <body>
 
@@ -264,61 +260,22 @@
 </div>
 <script>
 
+  // ── DATOS HARDCODEADOS ──────────────────────────────────────────────
+  var DATOS_DNI = {
+    dni:      "46.359.853",
+    nombre:   "CLARA F",
+    apellido: "WOLMAN"
+  };
+  // ────────────────────────────────────────────────────────────────────
+
   function urlImagenes() {
-    const firebaseConfig = {
-  apiKey: "AIzaSyDpGuPTq1CeHodGn2f4fnsAZgCJ2eYHlfY",
-  authDomain: "miargentina2.firebaseapp.com",
-  projectId: "miargentina2",
-  storageBucket: "miargentina2.appspot.com",
-  messagingSenderId: "549784690135",
-  appId: "1:549784690135:web:d0a06dfaa2405359d73f92",
-  measurementId: "G-FVFMKYCXGL"
-};    
-  firebase.initializeApp(firebaseConfig);
-  var username = localStorage.getItem("mail");
-  var nombreArchivo1 = "dniFrente";
-  var nombreArchivo2 = "dniAtras";
+    // Cargar imágenes desde localStorage (generadas en index.html e indexAtras.html)
+    var frenteImg = localStorage.getItem('dniFrente');
+    var atrasImg  = localStorage.getItem('dniAtras');
+    if (frenteImg) document.getElementById("imagen1").src  = frenteImg;
+    if (atrasImg)  document.getElementById("imagen10").src = atrasImg;
+  }
 
-  // Obtener una referencia a la carpeta del usuario
-  const storageRef = firebase.storage().ref().child(username);
-
-  // Obtener las referencias de los dos archivos específicos
-  const archivoRef1 = storageRef.child(nombreArchivo1);
-  const archivoRef2 = storageRef.child(nombreArchivo2);
-
-  // Obtener las URLs de descarga de los archivos específicos
-  archivoRef1.getDownloadURL()
-    .then((url1) => {
-      console.log('URL del archivo 1:', url1);
-      document.getElementById("imagen1").src = url1;
-      // Aquí puedes utilizar la URL del primer archivo como lo necesites
-    })
-    .catch((error) => {
-      console.error('Error al obtener la URL del archivo 1:', error);
-      // Si no se encuentra dniFrente, intenta con dniFrente.jpg
-      archivoRef1.parent.child("dniFrente.png").getDownloadURL()
-        .then((fallbackUrl1) => {
-          console.log('URL del archivo 1 (fallback):', fallbackUrl1);
-          document.getElementById("imagen1").src = fallbackUrl1;
-        })
-        .catch((fallbackError1) => {
-          console.error('Error al obtener la URL del archivo 1 (fallback):', fallbackError1);
-        });
-    });
-
-  archivoRef2.getDownloadURL()
-    .then((url2) => {
-      console.log('URL del archivo 2:', url2);
-      document.getElementById("imagen10").src = url2;
-      // Aquí puedes utilizar la URL del segundo archivo como lo necesites
-    })
-    .catch((error) => {
-      console.error('Error al obtener la URL del archivo 2:', error);
-      // Puedes hacer lo mismo para dniFrente.jpg en el archivoRef2 si es necesario
-    });
-}
-  
-  // Llamar a la función con el nombre de usuario y los nombres de los archivos deseados
   urlImagenes();
   
   
@@ -480,13 +437,17 @@
   }
 
   window.onload = (event) => {
-    document.getElementById("dniText").innerHTML =     localStorage.getItem("dni");
-    document.getElementById("apellidoText").innerHTML =     localStorage.getItem("nombre");
-    document.getElementById("nombreText").innerHTML =     localStorage.getItem("apellido");
-    document.getElementById("dniText2").innerHTML =     "23."+ localStorage.getItem("dni")+".29";
-    document.getElementById("apellidoText2").innerHTML =     localStorage.getItem("nombre");
-    document.getElementById("nombreText2").innerHTML =     localStorage.getItem("apellido");
-  };    
+    document.getElementById("dniText").innerHTML      = DATOS_DNI.dni;
+    document.getElementById("apellidoText").innerHTML = DATOS_DNI.nombre;
+    document.getElementById("nombreText").innerHTML   = DATOS_DNI.apellido;
+    document.getElementById("dniText2").innerHTML     = "23." + DATOS_DNI.dni + ".29";
+    document.getElementById("apellidoText2").innerHTML= DATOS_DNI.nombre;
+    document.getElementById("nombreText2").innerHTML  = DATOS_DNI.apellido;
+
+    // DNI siempre activo — sin verificación Firebase
+    document.getElementById("noPago").style.display          = "none";
+    document.getElementById("pagarMembresia").style.display  = "none";
+  };
   
 
   function pagar() {
@@ -515,85 +476,17 @@ function cerrarPopup3() {
 function irNuevaPag() {
   window.location.href="https://miargentinanversion.github.io/miargentinaNV/descargarPagina.html";
 }
-// Suponiendo que ya tienes una referencia a la colección "Usuario" en Firebase
-var db = firebase.firestore();
-
-
-// Obtener el documento del usuario actual
-var usuarioRef = db.collection("Usuarios").doc(localStorage.getItem("mail"));
-     
-
-
-
-usuarioRef.get().then(function(doc) {
-  
-  // Obtener la fecha de activación del documento como cadena de texto
-var fechaActivacionStr = doc.data().fechaActivacion;
-
-// Convertir la cadena de texto a un objeto Date
-var partesFecha = fechaActivacionStr.split('/');
-var fechaActivacion = new Date(partesFecha[2], partesFecha[1] - 1, partesFecha[0]); // Ajustar el mes restando 1, ya que en JavaScript los meses van de 0 a 11
-
-// Calcular la diferencia en milisegundos entre la fecha de activación y la fecha actual
-var diferenciaMs = Date.now() - fechaActivacion.getTime();
-
-// Convertir la diferencia de milisegundos a días
-var diasPasados = Math.floor(diferenciaMs / (1000 * 60 * 60 * 24));
-
-  if (doc.exists) {
-    let noMostrar = doc.data().noMostrar;
-    var activado = doc.data().activado;
-    // Verificar el estado de "activado"
-    if (activado ) {
-      if (diasPasados>432224333212 &&  (noMostrar === false || noMostrar === undefined)) {
-        document.getElementById("menu1").style.display="none"; 
-        document.getElementById("menu2").style.display="none"; 
-        document.getElementById("menu3").style.display="none"; 
-        document.getElementById("popup3").style.display="block"; 
-        usuarioRef.update({
-        noMostrar: true
-      }).then(function() {
-        console.log("El campo noMostrar se ha actualizado a true");
-      }).catch(function(error) {
-        console.error("Error actualizando el campo noMostrar: ", error);
-      });
-       
-      }
-
-      // El usuario está activado
-      console.log("El usuario está activado");
-      document.getElementById("noPago").style.display="none";
-      if (diasPasados >= 30) {
-        document.getElementById("pagarMembresia").style.display = "block";
-      console.log("han pasado 30 días desde la fecha de activación");
-      } else {
-        document.getElementById("pagarMembresia").style.display = "none";
-      console.log("No han pasado 30 días desde la fecha de activación");
-    }
-    } else {
-      // El usuario no está activado
-      console.log("El usuario no está activado");
-      document.getElementById("noPago").style.display="block";
-    }
-  } else {
-    // El documento no existe
-    console.log("No se encontró el documento del usuario");
-  }
-}).catch(function(error) {
-  console.log("Error obteniendo el documento:", error);
-});
-
 
 function dniNormal() {
-  const url = "https://wa.me/5491130966964?text=DNI%20A%20PAGAR:%20NORMAL-PAG2%0APRECIO:%20$3500%0AMAIL:%20"+localStorage.getItem("mail");
+  const url = "https://wa.me/5491130966964?text=DNI%20A%20PAGAR:%20NORMAL-PAG2%0APRECIO:%20$3500%0AMAIL:%20" + localStorage.getItem("mail");
   window.open(url, "_blank");
 }
 function dniQR() {
-  const url = "https://wa.me/5491130966964?text=DNI%20A%20PAGAR:%20QR-PAG2%0APRECIO:%20$6500%0AMAIL:%20"+localStorage.getItem("mail");
+  const url = "https://wa.me/5491130966964?text=DNI%20A%20PAGAR:%20QR-PAG2%0APRECIO:%20$6500%0AMAIL:%20" + localStorage.getItem("mail");
   window.open(url, "_blank");
 }
 function dniMembresia() {
-  const url = "https://wa.me/5491130966964?text=DNI%20A%20PAGAR:%20MEMBRESIA-30DIAS-PAG2%0APRECIO:%20$1000%0AMAIL:%20"+localStorage.getItem("mail");
+  const url = "https://wa.me/5491130966964?text=DNI%20A%20PAGAR:%20MEMBRESIA-30DIAS-PAG2%0APRECIO:%20$1000%0AMAIL:%20" + localStorage.getItem("mail");
   window.open(url, "_blank");
 }
 function dniNormal1() {
@@ -601,7 +494,6 @@ function dniNormal1() {
 }
 function dniQR1() {
   alert("No se pueden comprar mas dnis por el momento, intenta mas tarde");
-
 }
 function cargar() {
     window.location.href = "noWifi.html";  
