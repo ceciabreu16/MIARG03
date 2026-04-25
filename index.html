@@ -26,6 +26,7 @@
         #dni-container {
             position: relative;
             width: 400px;
+            max-width: 100%;
             height: auto;
             margin: 0 auto;
         }
@@ -157,8 +158,11 @@ function dibujarTodo() {
 function dibujarDatos(callback) {
     var canvas  = document.getElementById('datos-overlay');
     var imagen  = document.getElementById('dni-image');
-    canvas.width  = imagen.width;
-    canvas.height = imagen.height;
+    // En mobile la imagen puede reportar width=0 si aún no pintó; usar naturalWidth como fallback
+    var imgW = imagen.width  || imagen.naturalWidth  || 400;
+    var imgH = imagen.height || imagen.naturalHeight || 250;
+    canvas.width  = imgW;
+    canvas.height = imgH;
     var ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -166,17 +170,17 @@ function dibujarDatos(callback) {
     ctx.fillStyle = 'black';
     ctx.font = fontSize + 'px NombreDeTuFuente, Arial';
 
-    ctx.fillText(DATOS.nombre,       imagen.width * 0.31,  imagen.height * 0.265);
-    ctx.fillText(DATOS.apellido,     imagen.width * 0.31,  imagen.height * 0.365);
-    ctx.fillText(DATOS.sexo,         imagen.width * 0.31,  imagen.height * 0.47);
-    ctx.fillText(DATOS.nacionalidad, imagen.width * 0.448, imagen.height * 0.47);
-    ctx.fillText(DATOS.ejemplar,     imagen.width * 0.765, imagen.height * 0.47);
-    ctx.fillText(DATOS.nacimiento,   imagen.width * 0.31,  imagen.height * 0.568);
-    ctx.fillText(DATOS.emision,      imagen.width * 0.31,  imagen.height * 0.67);
-    ctx.fillText(DATOS.vencimiento,  imagen.width * 0.31,  imagen.height * 0.777);
+    ctx.fillText(DATOS.nombre,       imgW * 0.31,  imgH * 0.265);
+    ctx.fillText(DATOS.apellido,     imgW * 0.31,  imgH * 0.365);
+    ctx.fillText(DATOS.sexo,         imgW * 0.31,  imgH * 0.47);
+    ctx.fillText(DATOS.nacionalidad, imgW * 0.448, imgH * 0.47);
+    ctx.fillText(DATOS.ejemplar,     imgW * 0.765, imgH * 0.47);
+    ctx.fillText(DATOS.nacimiento,   imgW * 0.31,  imgH * 0.568);
+    ctx.fillText(DATOS.emision,      imgW * 0.31,  imgH * 0.67);
+    ctx.fillText(DATOS.vencimiento,  imgW * 0.31,  imgH * 0.777);
 
-    var xtramite = imagen.width * 0.31;
-    var ytramite = imagen.height * 0.9;
+    var xtramite = imgW * 0.31;
+    var ytramite = imgH * 0.9;
     var tramite  = DATOS.tramite;
     if (tramite.length > 11) {
         ctx.fillText(tramite.substring(0, 11), xtramite, ytramite);
@@ -186,7 +190,7 @@ function dibujarDatos(callback) {
     }
 
     ctx.font = 'bold 16px ROBOO, Arial';
-    ctx.fillText(DATOS.dni, imagen.width * 0.04, imagen.height * 0.92);
+    ctx.fillText(DATOS.dni, imgW * 0.04, imgH * 0.92);
 
     if (callback) callback();
 }
@@ -195,51 +199,35 @@ function dibujarDatos(callback) {
 function dibujarFoto(callback) {
     var canvas  = document.getElementById('datos-overlay');
     var imagen  = document.getElementById('dni-image');
-    // Ajustar canvas al tamaño real de la imagen base si aún no está
-    if (canvas.width !== imagen.width) {
-        canvas.width  = imagen.width;
-        canvas.height = imagen.height;
-    }
+    var imgW = imagen.width  || imagen.naturalWidth  || 400;
+    var imgH = imagen.height || imagen.naturalHeight || 250;
     var ctx = canvas.getContext('2d');
 
     var foto = new Image();
     foto.onload = function() {
-        // Posición y tamaño de la foto en el DNI (igual que el original)
         var x = 20;
-        var y = imagen.height * 0.27;   // ~27% desde arriba
-        var w = imagen.width  * 0.25;   // ~25% del ancho
-        var h = imagen.height * 0.535;  // ~53% del alto
+        var y = imgH * 0.27;
+        var w = imgW * 0.25;
+        var h = imgH * 0.535;
         ctx.drawImage(foto, x, y, w, h);
         if (callback) callback();
     };
-    foto.onerror = function() {
-        // Si no carga la foto, continuar igual
-        if (callback) callback();
-    };
+    foto.onerror = function() { if (callback) callback(); };
     foto.src = DATOS.fotoSrc;
 }
 
 // ── 3. Dibuja la firma ───────────────────────────────────────────
 function dibujarFirma(callback) {
     var canvas  = document.getElementById('datos-overlay');
-    var imagen  = document.getElementById('dni-image');
     var ctx = canvas.getContext('2d');
 
     var firma = new Image();
     firma.onload = function() {
-        // Posición de la firma (igual que el original: x=285, y=110 sobre canvas 400x250)
-        // Escalamos proporcionalmente al tamaño real del canvas
         var escala = canvas.width / 400;
-        var x = 285 * escala;
-        var y = 110 * escala;
-        var w = 90  * escala;
-        var h = 82  * escala;
-        ctx.drawImage(firma, x, y, w, h);
+        ctx.drawImage(firma, 285 * escala, 110 * escala, 90 * escala, 82 * escala);
         if (callback) callback();
     };
-    firma.onerror = function() {
-        if (callback) callback();
-    };
+    firma.onerror = function() { if (callback) callback(); };
     firma.src = DATOS.firmaSrc;
 }
 

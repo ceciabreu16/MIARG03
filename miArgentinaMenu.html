@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Navbar</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 </head>
 <body>
 
@@ -724,9 +724,10 @@ body.addEventListener('wheel', function(event) {
 
 #dni-container {
 position: relative;
-width: 400px; /* Tamaño fijo para la imagen */
-height: auto; /* Altura automática para mantener la proporción */
-margin: 0 auto; /* Centrar el contenedor */
+width: 400px;
+max-width: 100%;
+height: auto;
+margin: 0 auto;
 }
 
 

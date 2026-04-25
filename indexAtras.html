@@ -31,6 +31,7 @@
         #dni-container {
     position: relative;
     width: 400px;
+    max-width: 100%;
     height: auto;
     margin: 0 auto;
 }
@@ -145,11 +146,14 @@ function avanzar() {
 function actualizarDatos() {
     var canvas   = document.getElementById('datos-overlay');
     var imagen   = document.getElementById('dni-image');
-    canvas.width  = imagen.width;
-    canvas.height = imagen.height;
+    // Fallback para mobile donde width puede ser 0 antes de pintar
+    var imgW = imagen.width  || imagen.naturalWidth  || 400;
+    var imgH = imagen.height || imagen.naturalHeight || 250;
+    canvas.width  = imgW;
+    canvas.height = imgH;
     var contexto = canvas.getContext('2d');
     var domicilio = document.getElementById("domicilio").value.toUpperCase();
-    const maxWidth = 362;
+    const maxWidth = imgW * 0.9;
 
     contexto.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -157,16 +161,16 @@ function actualizarDatos() {
     contexto.font = 15 + 'px NombreDeTuFuente';
     contexto.letterSpacing = '2px'; 
 
-    var xApellido = imagen.width * 0.09;
-    var yApellido = imagen.height * 0.733;
-    var xNombre   = imagen.width * 0.09;
-    var yNombre   = imagen.height * 0.815;
-    var xsexo     = imagen.width * 0.09;
-    var ysexo     = imagen.height * 0.897;
-    var xdomicilio= imagen.width * 0.04;
-    var ydomicilio= imagen.height * 0.13;
-    var xLugarN   = imagen.width * 0.04;
-    var yLugarN   = imagen.height * 0.19;
+    var xApellido = imgW * 0.09;
+    var yApellido = imgH * 0.733;
+    var xNombre   = imgW * 0.09;
+    var yNombre   = imgH * 0.815;
+    var xsexo     = imgW * 0.09;
+    var ysexo     = imgH * 0.897;
+    var xdomicilio= imgW * 0.04;
+    var ydomicilio= imgH * 0.13;
+    var xLugarN   = imgW * 0.04;
+    var yLugarN   = imgH * 0.19;
 
     var espaciadoEntreLetras = 2;
 
